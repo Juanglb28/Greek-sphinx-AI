@@ -30,7 +30,7 @@ AWS Rekognition → Visual image analysis
 
 AWS Bedrock → Track/text generation
 
-AWS Polly (future) → Audio generation
+AWS Polly → Audio generation
 
 Boto3 → AWS official SDK
 
