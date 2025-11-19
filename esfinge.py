@@ -1,6 +1,10 @@
+# Librería necesaria para interactuar con los servicios de Amazon
 import boto3
+# librería para convertir JSON → Python
 import json
+# librería de Python para hacer peticiones HTTP
 import requests
+# OS es una librería que permite interactuar con el sistema operativo.
 import os
 
 
@@ -8,6 +12,7 @@ import os
 # CONFIGURACIÓN
 # ----------------------------------------------------
 
+# Api para recibir imagenes aleatorías
 API = "https://6i0b5kx1r7.execute-api.us-east-1.amazonaws.com/oraculo/random"
 
 rekognition = boto3.client("rekognition")

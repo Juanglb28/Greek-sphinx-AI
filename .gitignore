@@ -1,1 +1,35 @@
-/image.jpg
+# ---- Archivos de Python ----
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# ---- Entornos virtuales ----
+venv/
+env/
+.env/
+.virtualenv/
+
+# ---- Archivos del sistema ----
+.DS_Store
+Thumbs.db
+
+# ---- Archivos sensibles ----
+*.pem
+*.key
+*.env
+credentials
+aws_credentials
+
+# ---- Archivos generados por el Oráculo ----
+image.jpg
+*.mp3
+outputs/
+temp/
+
+# ---- Archivos de logs ----
+*.log
+
+# ---- Configuración local ----
+.idea/
+.vscode/
