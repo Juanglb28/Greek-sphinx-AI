@@ -1,26 +1,19 @@
-# Librería necesaria para interactuar con los servicios de Amazon
+# Librerías necesarias para interactuar con los servicios de Amazon
 import boto3
-# librería para convertir JSON → Python
 import json
-# librería de Python para hacer peticiones HTTP
 import requests
-# OS es una librería que permite interactuar con el sistema operativo.
 import os
-
 
 # ----------------------------------------------------
 # CONFIGURACIÓN
 # ----------------------------------------------------
 
-# Api para recibir imagenes aleatorías
 API = "https://6i0b5kx1r7.execute-api.us-east-1.amazonaws.com/oraculo/random"
 
 rekognition = boto3.client("rekognition")
 bedrock = boto3.client("bedrock-runtime")
 polly = boto3.client("polly")
 
-
-# Crear carpetas si no existen
 os.makedirs("Assets/image", exist_ok=True)
 os.makedirs("Assets/audio", exist_ok=True)
 
@@ -30,20 +23,18 @@ os.makedirs("Assets/audio", exist_ok=True)
 # ----------------------------------------------------
 def get_presigned_url():
     response = requests.get(API)
-    data = response.json()
-    return data["presignedUrl"]
+    return response.json()["presignedUrl"]
 
 
 # ----------------------------------------------------
 # Descargar imagen
 # ----------------------------------------------------
 def download_image(url):
-    response = requests.get(url)
-    return response.content
+    return requests.get(url).content
 
 
 # ----------------------------------------------------
-# Guardar imagen en Assets/image
+# Guardar imagen
 # ----------------------------------------------------
 def save_image(image_bytes, filename="imagen.jpg"):
     path = os.path.join("Assets/image", filename)
@@ -65,29 +56,41 @@ def detectar_etiquetas(image_bytes):
 
 
 # ----------------------------------------------------
-# Generar pistas con Bedrock Claude
+# Validación inteligente con estilo mitológico
 # ----------------------------------------------------
-def generar_pistas(etiquetas):
+def validar_respuesta_bedrock(respuesta_usuario, etiquetas):
     lista = ", ".join([label["Name"] for label in etiquetas])
 
     prompt = f"""
-    Eres La ESFINGE GRIEGA .
-    Debes generar pistas cortas, misteriosas y únicas.
-    No reveles directamente el objeto.
-    Etiquetas detectadas por Rekognition: {lista}
-    Entrega exactamente 3 pistas.
-    Si el usuario acierta, aumenta la dificultad para una nueva pregunta
+    Adopta el rol de LA ESFINGE GRIEGA.
+    Hablas en tono antiguo, poético, místico y solemne.
+    Nunca uses lenguaje técnico ni menciones “etiquetas”, “IA” o “coincidencias”.
+
+    Tu tarea es evaluar si la respuesta del mortal coincide con la verdad
+    oculta detrás de estas descripciones del objeto: {lista}.
+
+    Clasifica la respuesta en:
+    - "correcto": si acertó o dijo un sinónimo equivalente.
+    - "sinonimo": si su palabra es equivalente, relacionada o válida.
+    - "cercano": si intuye parte de la esencia pero no del todo.
+    - "incorrecto": si no guarda relación.
+
+    Devuelve SIEMPRE solo un JSON así:
+
+    {{
+        "resultado": "correcto" | "sinonimo" | "cercano" | "incorrecto",
+        "mensaje_esfinge": "tu mensaje místico, máximo 2 líneas"
+    }}
+
+    Respuesta del mortal: "{respuesta_usuario}"
     """
 
     payload = {
         "anthropic_version": "bedrock-2023-05-31",
-        "max_tokens": 150,
-        "temperature": 0.8,
+        "max_tokens": 200,
+        "temperature": 0.7,
         "messages": [
-            {
-                "role": "user",
-                "content": [{"type": "text", "text": prompt}]
-            }
+            {"role": "user", "content": [{"type": "text", "text": prompt}]}
         ]
     }
 
@@ -96,12 +99,49 @@ def generar_pistas(etiquetas):
         body=json.dumps(payload)
     )
 
-    result = json.loads(response["body"].read())
-    return result["content"][0]["text"]
+    raw = json.loads(response["body"].read())["content"][0]["text"]
+
+    try:
+        return json.loads(raw)
+    except:
+        return {
+            "resultado": "incorrecto",
+            "mensaje_esfinge": "Tus palabras se pierden como bruma en el abismo. Intenta de nuevo."
+        }
 
 
 # ----------------------------------------------------
-# Generar audio con Polly (voz femenina)
+# Generar pistas con Bedrock
+# ----------------------------------------------------
+def generar_pistas(etiquetas):
+    lista = ", ".join([label["Name"] for label in etiquetas])
+
+    prompt = f"""
+    Eres LA ESFINGE GRIEGA.
+    Ofrece exactamente 3 pistas en estilo enigmático, poético y simbólico.
+    No reveles directamente el objeto.
+    Basado en estas descripciones del mundo humano: {lista}
+    """
+
+    payload = {
+        "anthropic_version": "bedrock-2023-05-31",
+        "max_tokens": 160,
+        "temperature": 0.8,
+        "messages": [
+            {"role": "user", "content": [{"type": "text", "text": prompt}]}
+        ]
+    }
+
+    response = bedrock.invoke_model(
+        modelId="anthropic.claude-3-haiku-20240307-v1:0",
+        body=json.dumps(payload)
+    )
+
+    return json.loads(response["body"].read())["content"][0]["text"]
+
+
+# ----------------------------------------------------
+# Generar audio (Polly)
 # ----------------------------------------------------
 def generar_audio(texto, filename="oraculo.mp3"):
     response = polly.synthesize_speech(
@@ -111,7 +151,6 @@ def generar_audio(texto, filename="oraculo.mp3"):
     )
 
     audio_stream = response["AudioStream"].read()
-
     path = os.path.join("Assets/audio", filename)
 
     with open(path, "wb") as f:
@@ -123,36 +162,47 @@ def generar_audio(texto, filename="oraculo.mp3"):
 # ----------------------------------------------------
 # FLUJO COMPLETO DEL ORÁCULO
 # ----------------------------------------------------
-
 def oraculo():
-    print("🔮 Solicitando imagen al portal del destino...")
+    print("🔮 Solicitando imagen sagrada...")
     url = get_presigned_url()
 
-    print("📥 Descargando imagen...")
+    print("📥 Descargando visión del destino...")
     image_bytes = download_image(url)
 
-    print("💾 Guardando imagen en Assets/image...")
-    image_path = save_image(image_bytes)
-    print("Imagen guardada en:", image_path)
+    print("💾 Sellando la imagen en los archivos del Oráculo...")
+    save_image(image_bytes)
 
-    print("👁️ Analizando imagen con Rekognition...")
+    print("👁️ La Esfinge examina la escena...")
     etiquetas = detectar_etiquetas(image_bytes)
-    print("Etiquetas:", [e["Name"] for e in etiquetas])
 
-    print("\n🌀 Generando pistas con Bedrock...")
+    print("\n🌀 Tejiendo pistas enigmáticas...")
     pistas = generar_pistas(etiquetas)
-    print("Pistas generadas:\n", pistas)
+    print("\n--- PISTAS DE LA ESFINGE ---")
+    print(pistas)
 
-    print("\n🔊 Generando audio con Polly...")
-    audio_path = generar_audio(pistas)
-    print("Audio guardado en:", audio_path)
+    print("\n🔊 Invocando la voz del Oráculo...")
+    generar_audio(pistas)
 
-    print("\n✨ Proceso completado. El Oráculo ha hablado ✨")
+    print("\n✨ El Oráculo ha hablado. Ahora, mortal... responde. ✨")
+
+    # -----------------------------
+    # VALIDACIÓN MITOLÓGICA
+    # -----------------------------
+    respuesta = input("\n🗣️ ¿Qué crees que oculta la imagen?: ")
+
+    veredicto = validar_respuesta_bedrock(respuesta, etiquetas)
+
+    print("\n📜 La Esfinge responde:")
+    print(veredicto["mensaje_esfinge"])
+
+    if veredicto["resultado"] in ["correcto", "sinonimo"]:
+        print("\n🏆 Has superado el enigma de la Esfinge.")
+    else:
+        print("\n💀 Tu palabra no desveló el misterio...")
 
 
 # ----------------------------------------------------
 # EJECUCIÓN
 # ----------------------------------------------------
-
 if __name__ == "__main__":
     oraculo()
