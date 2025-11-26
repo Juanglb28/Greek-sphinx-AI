@@ -1,6 +1,6 @@
-🧙‍♂️ The Secret Oracle — Greek Sphinx AI
+🧙‍♂️ The Greek Sphinx AI
 
-The Secret Oracle is an artificial intelligence system capable of receiving an image (from an API), analyzing it using computer vision models from AWS Rekognition, and generating a clue, riddle, or symbolic interpretation using a language model in AWS Bedrock.
+The Greek Sphinx is an artificial intelligence system capable of receiving an image (from an API), analyzing it using computer vision models from AWS Rekognition, and generating a clue, riddle, or symbolic interpretation using a language model in AWS Bedrock.
 Later, the system will integrate AWS Polly to convert the clues into audio.
 
 This project aims to create a mysterious and interactive experience where users can "interpret" what the oracle sees without receiving a literal description.
