@@ -1,8 +1,13 @@
-# 🧙‍♂️ The Secret Oracle — Greek Sphinx AI
+#  The Secret Oracle — Greek Sphinx AI
 
-The Secret Oracle is an artificial intelligence system that creates a mysterious and interactive experience where users can "interpret" what the oracle sees. The system receives images from an external API, analyzes them using AWS Rekognition, generates enigmatic clues using AWS Bedrock, and converts them to audio using AWS Polly.
+The Greek Sphinx is an artificial intelligence system capable of receiving an image (from an API), analyzing it using computer vision models from AWS Rekognition, and generating a clue, riddle, or symbolic interpretation using a language model in AWS Bedrock.
+Later, the system will integrate AWS Polly to convert the clues into audio.
 
-## ✨ Features
+This project aims to create a mysterious and interactive experience where users can "interpret" what the oracle sees without receiving a literal description.
+
+
+
+##  Features
 
 - **Computer Vision**: AWS Rekognition analyzes images to detect objects and scenes
 - **AI-Powered Riddles**: AWS Bedrock (Claude) generates poetic, enigmatic clues
@@ -12,7 +17,7 @@ The Secret Oracle is an artificial intelligence system that creates a mysterious
 - **Cloud Storage**: AWS S3 for assets
 - **Modern Deployment**: Vercel for frontend, AWS Lambda for backend
 
-## 🏗️ Architecture
+##  Architecture
 
 ```
 User (Browser) → Vercel (Frontend)
@@ -24,15 +29,15 @@ User (Browser) → Vercel (Frontend)
     ┌─────────────────────────────────────┐
     │         Business Logic Layer        │
     │  • Image Processing (Rekognition)   │
-    │  • Clue Generation (Bedrock)       │
-    │  • Audio Synthesis (Polly)         │
-    │  • S3 Storage Management           │
+    │  • Clue Generation (Bedrock)        │
+    │  • Audio Synthesis (Polly)          │
+    │  • S3 Storage Management            │
     └─────────────────────────────────────┘
                       ↓
               AWS S3 (Assets Storage)
 ```
 
-## ⚙️ Technologies Used
+##  Technologies Used
 
 ### Backend
 - **Python 3.11+**
@@ -57,7 +62,7 @@ User (Browser) → Vercel (Frontend)
 - **AWS S3**: Static asset storage
 - **Vercel**: Frontend hosting and deployment
 
-## 📸 Workflow
+##  Workflow
 
 1. **Image Acquisition**: External API provides pre-signed URL
 2. **Download & Analysis**: System downloads image and uses Rekognition to detect objects/tags
@@ -67,7 +72,7 @@ User (Browser) → Vercel (Frontend)
 6. **User Interaction**: Frontend displays image/audio, user makes guesses
 7. **Validation**: AI evaluates user responses with sphinx-like wisdom
 
-## 🧠 Project Objective
+##  Project Objective
 
 Create an AI that acts as a modern oracle:
 - **Doesn't describe literally**—interprets symbolically
@@ -75,15 +80,33 @@ Create an AI that acts as a modern oracle:
 - **Provides mystical, enigmatic experiences**
 - **Combines ancient mythology with cutting-edge AI**
 
-## 📁 Project Structure
 
-```
-/Proyecto/
-├── oracle_service.py          # Core business logic
-├── server.py                  # Local development server
-├── sphinx.py                  # Legacy script (deprecated)
-├── requirements.txt           # Python dependencies
-├── env.example               # Environment variables template
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+🔮 Project Architecture
+
+User → Image → API → Amazon Rekognition
+                    ↓
+                Tags/Objecs
+                    ↓
+          Dynamic Prompt → AWS Bedrock
+                    ↓
+                  Riddle
+                    ↓
+               AWS Polly → Audio
+
+
+
+----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+
+📁Project Structure
+
+/Project
+│ main.py
+│ rekognition_utils.py
+│ bedrock_utils.py
+│ polly_utils.py (future)
+│ requirements.txt
+│ README.md
 │
 ├── lambda_sphinx/
 │   └── lambda_function.py     # AWS Lambda handler
@@ -103,7 +126,7 @@ Create an AI that acts as a modern oracle:
     └── audio/
 ```
 
-## 🚀 Deployment Guide
+##  Deployment Guide
 
 ### Prerequisites
 - AWS Account with appropriate permissions
